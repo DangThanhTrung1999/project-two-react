@@ -31,3 +31,22 @@
     transform: rotate(360deg);
   }
 }
+.text-right{
+  float:right;
+  cursor: pointer;
+}
+.text-right:hover{
+  color: chartreuse;
+}
+.mr-15{
+  margin-right: 15px;
+}
+.mr-5{
+  margin-right: 5px;
+}
+.mt-15{
+  margin-top: 15px;
+}
+.mb-15{
+  margin-bottom: 15px;
+}

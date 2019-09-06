@@ -1,12 +1,17 @@
 import React from 'react';
-import TaskItem from '../TaskItem';
+import TaskItem from './TaskItem';
 
 class TaskList extends React.Component {
   render() {
     var { tasks } = this.props;
     var elmTaskItem = tasks.map((task, index) => {
-      return <TaskItem key={task.id} index={index} task={task}></TaskItem>
-    })
+      return <TaskItem 
+      key={task.id} 
+      index={index} 
+      task={task}
+      onUpdateStatusItem={this.props.onUpdateStatusList}
+      ></TaskItem>
+    });
     return (
 
       <div className="row">

@@ -66,6 +66,20 @@ class App extends React.Component {
     })
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
+  onUpdateStatusApp=(id)=>{
+  var {tasks}=this.state;
+    var taskChange=tasks.map((task, index)=>{
+      if(task.id===id){
+        task.status=!task.status
+      }
+      return task;
+    }
+    )
+    this.setState({
+      tasks:taskChange
+    })
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
   render() {
     var { tasks, isDisplayForm } = this.state;
     var elmTaskform = isDisplayForm ?
@@ -110,7 +124,9 @@ class App extends React.Component {
             </button>
             <Control />
 
-            <TaskList tasks={tasks} />
+            <TaskList 
+            tasks={tasks}
+            onUpdateStatusList={this.onUpdateStatusApp} />
 
           </div>
 

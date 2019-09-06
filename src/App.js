@@ -45,19 +45,34 @@ class App extends React.Component {
     });
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
-  onToggle=()=>{
+  onToggle = () => {
     this.setState({
-      isDisplayForm:!this.state.isDisplayForm
+      isDisplayForm: !this.state.isDisplayForm
     })
   }
-  getFormChild=()=>{
+  getFormChild = () => {
     this.setState({
-      isDisplayForm:false
+      isDisplayForm: false
     })
+  }
+  onSubmitParent = (data) => {
+    var randomstring = require("randomstring");
+
+    var {tasks}= this.state;
+    data.id=randomstring.generate();
+    tasks.push(data);
+    this.setState({
+      tasks:tasks
+    })
+    localStorage.setItem('tasks', JSON.stringify(tasks));
   }
   render() {
     var { tasks, isDisplayForm } = this.state;
-    var elmTaskform = isDisplayForm ? <TaskForm onClose={this.getFormChild}/> : '';
+    var elmTaskform = isDisplayForm ?
+      <TaskForm
+        onSubmit={this.onSubmitParent}
+        onClose={this.getFormChild} />
+      : '';
     return (
       <div className="container">
         <div className="text-center">
@@ -79,10 +94,10 @@ class App extends React.Component {
               "col-xs-12 col-sm-12 col-md-12 col-lg-12"}
           >
 
-            <button 
-            type="button" 
-            className="btn btn-primary mr-15"
-            onClick={this.onToggle}>
+            <button
+              type="button"
+              className="btn btn-primary mr-15"
+              onClick={this.onToggle}>
               <span className="fa fa-plus mr-15"></span>
               Thêm công việc
             </button>

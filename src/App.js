@@ -3,13 +3,19 @@ import './App.css';
 import TaskForm from './components/TaskForm';
 import Control from './components/Control';
 import TaskList from './components/TaskList';
+import { file } from '@babel/types';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       tasks: [],
-      isDisplayForm: false
+      isDisplayForm: false,
+      taskEditing: '',
+      filter: {
+        name: '',
+        status: -1
+      }
     }
   }
   componentWillMount() {
@@ -47,7 +53,8 @@ class App extends React.Component {
   }
   onToggle = () => {
     this.setState({
-      isDisplayForm: !this.state.isDisplayForm
+      isDisplayForm: !this.state.isDisplayForm,
+      taskEditing: null
     })
   }
   getFormChild = () => {
@@ -55,37 +62,98 @@ class App extends React.Component {
       isDisplayForm: false
     })
   }
-  onSubmitParent = (data) => {
+  onSubmit = (data) => {
     var randomstring = require("randomstring");
-
-    var {tasks}= this.state;
-    data.id=randomstring.generate();
-    tasks.push(data);
+    var { tasks } = this.state;
+    if (data.id === '') {
+      data.id = randomstring.generate();
+      tasks.push(data);
+    } else {
+      var index = this.findIndex(data.id);
+      tasks[index] = data;
+    }
     this.setState({
-      tasks:tasks
+      tasks: tasks,
+      taskEditing: null
     })
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
-  onUpdateStatusApp=(id)=>{
-  var {tasks}=this.state;
-    var taskChange=tasks.map((task, index)=>{
-      if(task.id===id){
-        task.status=!task.status
-      }
-      return task;
+  onUpdateStatusApp = (id) => {
+    var { tasks } = this.state;
+    var index = this.findIndex(id);
+    if (index !== -1) {
+      tasks[index].status = !tasks[index].status;
     }
-    )
     this.setState({
-      tasks:taskChange
+      tasks: tasks
     })
     localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+  findIndex = (id) => {
+    var { tasks } = this.state;
+    var result = -1;
+    tasks.forEach((task, index) => {
+      if (task.id === id)
+        result = index
+    });
+    return result
+  }
+  onDelete = (id) => {
+    var { tasks } = this.state;
+    var index = this.findIndex(id);
+    if (index !== -1) {
+      tasks.splice(index, 1);
+    }
+    this.setState({
+      tasks: tasks
+    })
+    this.getFormChild();
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+  onShowForm = () => {
+    this.setState({
+      isDisplayForm: true
+    })
+  }
+  onUpdate = (id) => {
+    var { tasks } = this.state;
+    var index = this.findIndex(id);
+    console.log(index);
+    var taskEditing = tasks[index];
+    this.setState({
+      taskEditing: taskEditing
+    })
+    this.onShowForm();
+  }
+  onFilter = (filterName, filterStatus) => {
+    filterStatus = +filterStatus;
+    this.setState({
+      filter: {
+        name: filterName.toLowerCase(),
+        status: filterStatus
+      }
+    })
   }
   render() {
-    var { tasks, isDisplayForm } = this.state;
+    var { tasks, isDisplayForm, taskEditing, filter } = this.state;
+    if (filter) {
+      if (filter.name) {
+        tasks = tasks.filter((task) => {
+          return task.name.toLowerCase().indexOf(filter.name) !== -1;
+        })
+      }
+      tasks = tasks.filter((task) => {
+        if (filter.status === -1) {
+          return task;
+        }
+        return task.status === (filter.status === 1 ? true : false);
+      })
+    }
     var elmTaskform = isDisplayForm ?
       <TaskForm
-        onSubmit={this.onSubmitParent}
-        onClose={this.getFormChild} />
+        onSubmit={this.onSubmit}
+        onClose={this.getFormChild}
+        task={taskEditing} />
       : '';
     return (
       <div className="container">
@@ -124,9 +192,12 @@ class App extends React.Component {
             </button>
             <Control />
 
-            <TaskList 
-            tasks={tasks}
-            onUpdateStatusList={this.onUpdateStatusApp} />
+            <TaskList
+              tasks={tasks}
+              onUpdateStatusList={this.onUpdateStatusApp}
+              onDelete={this.onDelete}
+              onUpdate={this.onUpdate}
+              onFilter={this.onFilter} />
 
           </div>
 

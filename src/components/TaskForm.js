@@ -4,6 +4,7 @@ class TaskForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: '',
       name: '',
       status: false
     }
@@ -27,18 +28,37 @@ class TaskForm extends React.Component {
     this.props.onSubmit(this.state);
     this.onChangeDisplay()
   }
-  onClear=()=>{
+  onClear = () => {
     this.setState({
-      name:'',
-      status:false
+      name: '',
+      status: false
     })
   }
+  componentWillMount() {
+    if (this.props.task) {
+      this.setState({
+        id: this.props.task.id,
+        name: this.props.task.name,
+        status: this.props.task.id
+      })
+    }
+  }
+  componentWillReceiveProps(nextProps){
+    if(nextProps && nextProps.task){
+      this.setState({
+        id: nextProps.task.id,
+        name: nextProps.task.name,
+        status: nextProps.task.id
+      });
+    }
+  }
   render() {
+    var {id}=this.state;
     return (
       <div className="panel panel-danger">
         <div className="panel-heading">
           <h3 className="panel-title">
-            Thêm công việc
+            {id!==''?'Cập nhật công việc':'Thêm công việc'}
                     <span
               className="fa fa-times text-right"
               onClick={this.onChangeDisplay}
@@ -71,10 +91,10 @@ class TaskForm extends React.Component {
               </select>
             </div>
             <button type="submit" className="btn btn-primary mr-15">Submit</button>
-            <button 
-            type="reset" 
-            className="btn btn-danger"
-            onClick={this.onClear}>Hủy bỏ</button>
+            <button
+              type="reset"
+              className="btn btn-danger"
+              onClick={this.onClear}>Hủy bỏ</button>
           </form>
 
         </div>

@@ -3,7 +3,6 @@ import './App.css';
 import TaskForm from './components/TaskForm';
 import Control from './components/Control';
 import TaskList from './components/TaskList';
-import { file } from '@babel/types';
 
 class App extends React.Component {
   constructor(props) {
@@ -15,7 +14,8 @@ class App extends React.Component {
       filter: {
         name: '',
         status: -1
-      }
+      },
+      keyword: ''
     }
   }
   componentWillMount() {
@@ -134,8 +134,14 @@ class App extends React.Component {
       }
     })
   }
+  onSearch = (keyword) => {
+    keyword = keyword.toLowerCase();
+    this.setState({
+      keyword: keyword
+    })
+  }
   render() {
-    var { tasks, isDisplayForm, taskEditing, filter } = this.state;
+    var { tasks, isDisplayForm, taskEditing, filter, keyword } = this.state;
     if (filter) {
       if (filter.name) {
         tasks = tasks.filter((task) => {
@@ -147,6 +153,12 @@ class App extends React.Component {
           return task;
         }
         return task.status === (filter.status === 1 ? true : false);
+      })
+    }
+    if (keyword) {
+      // console.log(keyword);
+      tasks = tasks.filter((task) => {
+        return task.name.toLowerCase().indexOf(keyword) !== -1;
       })
     }
     var elmTaskform = isDisplayForm ?
@@ -190,7 +202,7 @@ class App extends React.Component {
               <span className="fa fa-plus mr-15"></span>
               Generate Data
             </button>
-            <Control />
+            <Control onSearch={this.onSearch} />
 
             <TaskList
               tasks={tasks}
